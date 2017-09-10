@@ -13,6 +13,8 @@ Widget::Widget(QWidget *parent) :
     sensorThread.start();
 
     // Connect signals
+    qRegisterMetaType<ColorSensorAccess::ColorData>("ColorSensorAccess::ColorData");
+
     connect( this, SIGNAL(doReading(bool)), colorSensor, SLOT(startReading(bool)) );
     connect( this, SIGNAL(stopReading()), colorSensor, SLOT(stopReading()) );
     connect( colorSensor, SIGNAL(dataRead(ColorSensorAccess::ColorData)), this, SLOT(setData(ColorSensorAccess::ColorData)) );
