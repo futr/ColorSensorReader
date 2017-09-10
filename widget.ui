@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>501</width>
-    <height>375</height>
+    <width>529</width>
+    <height>391</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Widget</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="openButton">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>30</y>
+     <x>400</x>
+     <y>50</y>
      <width>101</width>
      <height>25</height>
     </rect>
@@ -26,11 +26,11 @@
     <string>Open sensor</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="saveLogButton">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>90</y>
+     <x>400</x>
+     <y>120</y>
      <width>101</width>
      <height>25</height>
     </rect>
@@ -39,11 +39,11 @@
     <string>Close sensor</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3">
+  <widget class="QPushButton" name="initializeButton">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>60</y>
+     <x>400</x>
+     <y>80</y>
      <width>101</width>
      <height>25</height>
     </rect>
@@ -52,7 +52,7 @@
     <string>Initialize</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_4">
+  <widget class="QPushButton" name="readSensorButton">
    <property name="geometry">
     <rect>
      <x>238</x>
@@ -65,7 +65,7 @@
     <string>Read</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_5">
+  <widget class="QPushButton" name="readSensorContButton">
    <property name="geometry">
     <rect>
      <x>238</x>
@@ -78,7 +78,7 @@
     <string>Read contnuously</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_6">
+  <widget class="QPushButton" name="stopReadingButton">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -91,11 +91,11 @@
     <string>Stop reading</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="plainTextEdit">
+  <widget class="QPlainTextEdit" name="logEdit">
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>210</y>
+     <y>240</y>
      <width>191</width>
      <height>101</height>
     </rect>
@@ -127,11 +127,11 @@
     <string>Save</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="colorPreviewLabel">
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>320</y>
+     <y>340</y>
      <width>181</width>
      <height>31</height>
     </rect>
@@ -140,13 +140,13 @@
     <string>Color label</string>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QGroupBox" name="integrationTimeGroupBox">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>151</width>
-     <height>131</height>
+     <width>251</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="title">
@@ -154,9 +154,9 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QRadioButton" name="radioButton">
+     <widget class="QRadioButton" name="intTime0Button">
       <property name="text">
-       <string>RadioButton</string>
+       <string>87.5[us]</string>
       </property>
       <property name="checked">
        <bool>true</bool>
@@ -164,59 +164,125 @@
      </widget>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton_2">
+     <widget class="QRadioButton" name="intTime1Button">
       <property name="text">
-       <string>RadioButton</string>
+       <string>1.4[ms]</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton_3">
+     <widget class="QRadioButton" name="intTime2Button">
       <property name="text">
-       <string>RadioButton</string>
+       <string>22.4[ms]</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton_4">
+     <widget class="QRadioButton" name="intTime3Button">
       <property name="text">
-       <string>RadioButton</string>
+       <string>179.2[ms]</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="intTimeManButton">
+      <property name="text">
+       <string>Manual(not yet implemented)</string>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
+  <widget class="QGroupBox" name="gainGroupBox">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>280</x>
      <y>10</y>
-     <width>136</width>
-     <height>131</height>
+     <width>81</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="title">
-    <string>Sensitivity</string>
+    <string>Gain</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QRadioButton" name="radioButton_5">
+     <widget class="QRadioButton" name="lowButton">
       <property name="text">
-       <string>RadioButton</string>
+       <string>Low</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton_6">
+     <widget class="QRadioButton" name="highButton">
       <property name="text">
-       <string>RadioButton</string>
+       <string>High</string>
       </property>
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="quitButton">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>150</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>220</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>B,G,R,IR</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="sensorPathEdit">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>20</y>
+     <width>113</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/dev/i2c-0</string>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>quitButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Widget</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>466</x>
+     <y>164</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>227</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
