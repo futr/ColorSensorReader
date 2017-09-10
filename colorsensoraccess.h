@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QDebug>
 #include <QThread>
+#include <QtEndian>
 
 #include <sys/ioctl.h>
 #include <linux/i2c.h>

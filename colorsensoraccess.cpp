@@ -2,7 +2,7 @@
 
 ColorSensorAccess::ColorSensorAccess(QObject *parent) : QObject(parent),
     sensorAddress( SensorAddress ),
-    sensorPath( "/dev/i2c-0" ),
+    sensorPath( "/dev/i2c-1" ),
     file( -1 )
 {
 
@@ -63,6 +63,7 @@ bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intT
     write( file, bytes, 2 );
     */
 
+    // Using IOCTL
     i2c_rdwr_ioctl_data i2cData;
     i2c_msg i2cMsg[2];
     int ret;
@@ -88,13 +89,17 @@ bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intT
 
     ret = ioctl( file, I2C_RDWR, &i2cData );
 
-    qDebug() << ret;
+    //qDebug() << ret;
 
     return true;
 }
 
 void ColorSensorAccess::closeSensor()
 {
+    if ( file < 0 ) {
+        return;
+    }
+
     close( file );
 
     file = -1;
@@ -123,6 +128,7 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
     read( file, bytes, 8 );
     */
 
+    // Using IOCTL
     i2c_rdwr_ioctl_data i2cData;
     i2c_msg i2cMsg[2];
     uint8_t reg = 0x03;
@@ -143,14 +149,20 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
 
     ret = ioctl( file, I2C_RDWR, &i2cData );
 
-    qDebug() << ret;
+    //qDebug() << ret;
 
     // Store into structure
     mutex.lock();
+    colorData.red      = qFromBigEndian<uint16_t>( (uint16_t *)( bytes + 0 ) );
+    colorData.green    = qFromBigEndian<uint16_t>( (uint16_t *)( bytes + 2 ) );
+    colorData.blue     = qFromBigEndian<uint16_t>( (uint16_t *)( bytes + 4 ) );
+    colorData.infraRed = qFromBigEndian<uint16_t>( (uint16_t *)( bytes + 6 ) );
+    /*
     colorData.red      = *(uint16_t *)( bytes + 0 );
     colorData.green    = *(uint16_t *)( bytes + 2 );
     colorData.blue     = *(uint16_t *)( bytes + 4 );
     colorData.infraRed = *(uint16_t *)( bytes + 6 );
+    */
     mutex.unlock();
 
     emit dataRead( colorData );
@@ -173,6 +185,7 @@ void ColorSensorAccess::waitIntegrationTime()
         QThread::msleep( 200 );
         break;
     default:
+        // Need to calculate integral time
         QThread::msleep( 500 );
         break;
     }

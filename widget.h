@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
 
 #include "colorsensoraccess.h"
 
@@ -42,8 +44,6 @@ private slots:
 
     void on_initializeButton_clicked();
 
-    void on_saveLogButton_clicked();
-
     void on_pushButton_7_clicked();
 
     void on_pushButton_8_clicked();
@@ -53,6 +53,8 @@ private slots:
     void on_readSensorContButton_clicked();
 
     void on_stopReadingButton_clicked();
+
+    void on_closeSensorButton_clicked();
 
 private:
     void setColorLabel( ColorSensorAccess::ColorData data );
