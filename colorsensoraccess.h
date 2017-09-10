@@ -80,4 +80,6 @@ private:
     int file;
 };
 
+Q_DECLARE_METATYPE(ColorSensorAccess::ColorData)
+
 #endif // COLORSENSORACCESS_H
