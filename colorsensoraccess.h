@@ -60,7 +60,7 @@ public:
     void waitIntegrationTime();
 
 signals:
-    void dataRead( ColorData data );
+    void dataRead( ColorSensorAccess::ColorData data );
 
 public slots:
     void startReading( bool continuously = false );

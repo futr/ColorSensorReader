@@ -12,6 +12,11 @@ Widget::Widget(QWidget *parent) :
     colorSensor->moveToThread( &sensorThread );
     sensorThread.start();
 
+    // Connect signals
+    connect( this, SIGNAL(doReading(bool)), colorSensor, SLOT(startReading(bool)) );
+    connect( this, SIGNAL(stopReading()), colorSensor, SLOT(stopReading()) );
+    connect( colorSensor, SIGNAL(dataRead(ColorSensorAccess::ColorData)), this, SLOT(setData(ColorSensorAccess::ColorData)) );
+
     // Setup button groups
     intTimeGroup.addButton( ui->intTime0Button, ColorSensorAccess::T00 );
     intTimeGroup.addButton( ui->intTime1Button, ColorSensorAccess::T01 );
