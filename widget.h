@@ -34,6 +34,7 @@ private:
 
 public slots:
     void setData( ColorSensorAccess::ColorData data );
+    void statusMessage( QString str );
 
 signals:
     void doReading( bool continuously );

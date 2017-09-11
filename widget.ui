@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
-    <height>439</height>
+    <width>530</width>
+    <height>389</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,10 +26,23 @@
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QGroupBox" name="integrationTimeGroupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="title">
           <string>Integration time</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="intTime2Button">
+            <property name="text">
+             <string>22.4[ms]</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QRadioButton" name="intTime0Button">
             <property name="text">
@@ -47,10 +60,10 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QRadioButton" name="intTime2Button">
-            <property name="text">
-             <string>22.4[ms]</string>
+          <item row="3" column="0" rowspan="2" colspan="2">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
@@ -64,50 +77,26 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="2">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QCheckBox" name="intTimeManButton">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Manual</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="intTimeSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="maximum">
-               <number>65535</number>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="intTimeManButton">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string>Manual</string>
+            </property>
+           </widget>
           </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+          <item row="5" column="1">
+           <widget class="QSpinBox" name="intTimeSpinBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <number>65535</number>
+            </property>
+            <property name="value">
+             <number>0</number>
             </property>
            </widget>
           </item>
@@ -116,6 +105,12 @@
        </item>
        <item>
         <widget class="QGroupBox" name="gainGroupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="title">
           <string>Gain</string>
          </property>
@@ -155,7 +150,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="logEdit"/>
+        <widget class="QPlainTextEdit" name="logEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -190,8 +192,27 @@
        </item>
        <item>
         <widget class="QLabel" name="colorPreviewLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Color label</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="intTimeLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Last integration time : </string>
          </property>
         </widget>
        </item>
@@ -290,6 +311,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="aboutLabel">
+       <property name="text">
+        <string>(c) ONCT 2017</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="quitButton">

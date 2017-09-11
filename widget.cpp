@@ -51,6 +51,18 @@ void Widget::setData(ColorSensorAccess::ColorData data)
 
     ui->logEdit->appendPlainText( str );
     ui->logEdit->ensureCursorVisible();
+
+    // Show last integration time if in manual integration mode
+    if ( colorSensor->getManualIntegrationMode() ) {
+        ui->intTimeLabel->setText( QString( "Last integration time : %1[ms]" ).arg( colorSensor->getLastElapsedNanosec() / 1000.0 / 1000 ) );
+    } else {
+        ui->intTimeLabel->setText( "Integration time measuring is not supported" );
+    }
+}
+
+void Widget::statusMessage(QString str)
+{
+    ui->intTimeLabel->setText( str );
 }
 
 void Widget::enableSensorButtons(bool enable)
@@ -121,6 +133,8 @@ void Widget::on_openButton_clicked()
     }
 
     enableSensorButtons();
+
+    statusMessage( "Device Opening is completed" );
 }
 
 void Widget::on_initializeButton_clicked()
@@ -128,7 +142,10 @@ void Widget::on_initializeButton_clicked()
     if( !colorSensor->initializeSensor( (ColorSensorAccess::IntegrationTime)intTimeGroup.checkedId(), ui->intTimeManButton->isChecked(), ui->intTimeSpinBox->value(), (ColorSensorAccess::Gain)gainGroup.checkedId() ) )
     {
         QMessageBox::critical( this, "Error", "Failed to initialize color sensor" );
+        return;
     }
+
+    statusMessage( "Initialization is completed" );
 }
 
 void Widget::on_pushButton_7_clicked()

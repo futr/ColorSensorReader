@@ -87,7 +87,11 @@ bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intT
         i2cData.nmsgs = 1;
 
         ret = ioctl( file, I2C_RDWR, &i2cData );
-        qDebug() << ret;
+        // qDebug() << ret;
+
+        if ( ret < 0 ) {
+            return false;
+        }
     }
 
     // reset ADC, disable sleeping
@@ -112,7 +116,11 @@ bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intT
     i2cData.nmsgs = 2;
 
     ret = ioctl( file, I2C_RDWR, &i2cData );
-    qDebug() << ret;
+    // qDebug() << ret;
+
+    if ( ret < 0 ) {
+        return false;
+    }
 
     return true;
 }
@@ -152,26 +160,44 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
     uint8_t reg;
     int ret;
 
-    // Disable sleep mode if integration mode is manual
+    // Wait for integration
     if ( manualIntegrationMode ) {
-        bytes[0] = 0x00;
-        bytes[1] = controlByte & 0x0F;
+        // Reset system, start integration
+        initializeSensor( intTime, manualIntegrationMode, manualTime, gain );
+
+        // Measure elapsed time of integration
+        elapsed.start();
+
+        // Wait until mode is not sleep
+        reg = 0x00;
 
         i2cMsg[0].addr  = sensorAddress;
-        i2cMsg[0].buf   = bytes;
+        i2cMsg[0].buf   = &reg;
         i2cMsg[0].flags = 0;
-        i2cMsg[0].len   = 2;
+        i2cMsg[0].len   = 1;
+
+        i2cMsg[1].addr  = sensorAddress;
+        i2cMsg[1].buf   = bytes;
+        i2cMsg[1].flags = I2C_M_RD;
+        i2cMsg[1].len   = 1;
 
         i2cData.msgs  = i2cMsg;
-        i2cData.nmsgs = 1;
+        i2cData.nmsgs = 2;
 
-        ret = ioctl( file, I2C_RDWR, &i2cData );
-        qDebug() << ret;
-    }
+        do {
+            ret = ioctl( file, I2C_RDWR, &i2cData );
 
-    // Wait until doing integration
-    if ( waitForIntegration ) {
-        waitIntegrationTime();
+            if ( ret < 0 ) {
+                break;
+            }
+        } while ( !( bytes[0] & 0x20 ) );
+
+        lastElapsedNanosec = elapsed.nsecsElapsed();
+    } else {
+        // Wait until doing integration
+        if ( waitForIntegration ) {
+            waitIntegrationTime();
+        }
     }
 
     // Read data
@@ -191,7 +217,11 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
     i2cData.nmsgs = 2;
 
     ret = ioctl( file, I2C_RDWR, &i2cData );
-    qDebug() << ret;
+    // qDebug() << ret;
+
+    if ( ret < 0 ) {
+        return;
+    }
 
     // Store data into structure
     // host processor is assumed as little endian in this block
@@ -208,22 +238,22 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
 void ColorSensorAccess::waitIntegrationTime()
 {
     // Wait for integration time
-    unsigned int ms;
+    unsigned long ms;
 
     if ( !manualIntegrationMode ) {
         // Static time integration mode
         switch ( intTime ) {
         case T00:
-            ms = 1;
+            ms = 5 * 4;
             break;
         case T01:
-            ms = 5;
+            ms = 5 * 4;
             break;
         case T10:
-            ms = 30;
+            ms = 30 * 4;
             break;
         case T11:
-            ms = 200;
+            ms = 200 * 4;
             break;
         default:
             // NOT ENTER HERE
@@ -234,16 +264,16 @@ void ColorSensorAccess::waitIntegrationTime()
         // Manual integration mode
         switch ( intTime ) {
         case T00:
-            ms = 1 * manualTime;
+            ms = 5 * 4 * manualTime;
             break;
         case T01:
-            ms = 5 * manualTime;
+            ms = 5 * 4 * manualTime;
             break;
         case T10:
-            ms = 60 * manualTime;
+            ms = 60 * 4 * manualTime;
             break;
         case T11:
-            ms = 400 * manualTime;
+            ms = 450 * 4 * manualTime;
             break;
         default:
             // NOT ENTER HERE
@@ -267,4 +297,14 @@ void ColorSensorAccess::startReading(bool continuously)
 void ColorSensorAccess::stopReading()
 {
     doReading = false;
+}
+
+bool ColorSensorAccess::getManualIntegrationMode() const
+{
+    return manualIntegrationMode;
+}
+
+qint64 ColorSensorAccess::getLastElapsedNanosec() const
+{
+    return lastElapsedNanosec;
 }

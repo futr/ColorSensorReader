@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QThread>
 #include <QtEndian>
+#include <QElapsedTimer>
 
 #include <sys/ioctl.h>
 #include <linux/i2c.h>
@@ -60,6 +61,10 @@ public:
 
     void waitIntegrationTime();
 
+    qint64 getLastElapsedNanosec() const;
+
+    bool getManualIntegrationMode() const;
+
 signals:
     void dataRead( ColorSensorAccess::ColorData data );
 
@@ -78,6 +83,9 @@ private:
     uint16_t manualTime;
     uint8_t controlByte;
     ColorData colorData;
+
+    QElapsedTimer elapsed;
+    qint64 lastElapsedNanosec;
 
     bool doReading;
 
