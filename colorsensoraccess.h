@@ -25,11 +25,11 @@ public:
     };
 
     enum IntegrationTime {
-        T00 = 0,
-        T01,
-        T10,
-        T11,
-        Manual,
+        T00    = 0x00,
+        T01    = 0x01,
+        T10    = 0x02,
+        T11    = 0x03,
+        Manual = 0x04,
     };
 
     enum Gain {
@@ -53,7 +53,7 @@ public:
     explicit ColorSensorAccess(QObject *parent = 0);
 
     bool openSensor(QString filePath = "/dev/i2c-0");
-    bool initializeSensor( IntegrationTime intTime, Gain gain );
+    bool initializeSensor(IntegrationTime intTime, bool manualIntegrationMode, uint16_t manualTime, Gain gain );
     void closeSensor();
 
     void readColors( bool waitForIntegration );
@@ -74,6 +74,9 @@ private:
     QString sensorPath;
     Gain gain;
     IntegrationTime intTime;
+    bool manualIntegrationMode;
+    uint16_t manualTime;
+    uint8_t controlByte;
     ColorData colorData;
 
     bool doReading;

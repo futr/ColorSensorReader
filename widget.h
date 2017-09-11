@@ -40,6 +40,8 @@ signals:
     void stopReading( void );
 
 private slots:
+    void enableSensorButtons( bool enable = true );
+
     void on_openButton_clicked();
 
     void on_initializeButton_clicked();

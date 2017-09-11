@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>356</height>
+    <width>617</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -36,7 +36,7 @@
              <string>87.5[us]</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -59,12 +59,18 @@
             <property name="text">
              <string>179.2[ms]</string>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="2">
+          <item row="3" column="0" colspan="2">
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QRadioButton" name="intTimeManButton">
+             <widget class="QCheckBox" name="intTimeManButton">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="text">
                <string>Manual</string>
               </property>
@@ -84,7 +90,10 @@
              </spacer>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBox">
+             <widget class="QSpinBox" name="intTimeSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="maximum">
                <number>65535</number>
               </property>
@@ -94,6 +103,13 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -110,7 +126,7 @@
              <string>Low</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -118,6 +134,9 @@
            <widget class="QRadioButton" name="highButton">
             <property name="text">
              <string>High</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -225,13 +244,25 @@
      </item>
      <item>
       <widget class="QPushButton" name="readSensorButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Read</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="readSensorContButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Read contnuously</string>
        </property>
@@ -239,6 +270,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="stopReadingButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Stop reading</string>
        </property>
@@ -278,12 +312,28 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>466</x>
-     <y>164</y>
+     <x>606</x>
+     <y>428</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>
      <y>227</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>intTimeManButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>intTimeSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>168</x>
+     <y>114</y>
     </hint>
    </hints>
   </connection>

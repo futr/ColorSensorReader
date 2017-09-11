@@ -24,7 +24,6 @@ Widget::Widget(QWidget *parent) :
     intTimeGroup.addButton( ui->intTime1Button, ColorSensorAccess::T01 );
     intTimeGroup.addButton( ui->intTime2Button, ColorSensorAccess::T10 );
     intTimeGroup.addButton( ui->intTime3Button, ColorSensorAccess::T11 );
-    intTimeGroup.addButton( ui->intTimeManButton, ColorSensorAccess::Manual );
 
     gainGroup.addButton( ui->lowButton, ColorSensorAccess::Low );
     gainGroup.addButton( ui->highButton, ColorSensorAccess::High );
@@ -54,6 +53,16 @@ void Widget::setData(ColorSensorAccess::ColorData data)
     ui->logEdit->ensureCursorVisible();
 }
 
+void Widget::enableSensorButtons(bool enable)
+{
+    ui->openButton->setEnabled( !enable );
+    ui->initializeButton->setEnabled( enable );
+    ui->closeSensorButton->setEnabled( enable );
+    ui->readSensorButton->setEnabled( enable );
+    ui->readSensorContButton->setEnabled( enable );
+    ui->stopReadingButton->setEnabled( enable );
+}
+
 void Widget::setColorLabel(ColorSensorAccess::ColorData data)
 {
     QPixmap map( ui->colorPreviewLabel->size() );
@@ -81,11 +90,9 @@ void Widget::setColorLabel(ColorSensorAccess::ColorData data)
     if ( r > max ) {
         max = r;
     }
-    /*
-    if ( data.infraRed > max ) {
-        max = data.infraRed;
+    if ( ir > max ) {
+        max = ir;
     }
-    */
 
     // Normalize
     b = b / max;
@@ -113,14 +120,12 @@ void Widget::on_openButton_clicked()
         return;
     }
 
-    ui->openButton->setEnabled( false );
-    ui->initializeButton->setEnabled( true );
-    ui->closeSensorButton->setEnabled( true );
+    enableSensorButtons();
 }
 
 void Widget::on_initializeButton_clicked()
 {
-    if( !colorSensor->initializeSensor( (ColorSensorAccess::IntegrationTime)intTimeGroup.checkedId(), (ColorSensorAccess::Gain)gainGroup.checkedId() ) )
+    if( !colorSensor->initializeSensor( (ColorSensorAccess::IntegrationTime)intTimeGroup.checkedId(), ui->intTimeManButton->isChecked(), ui->intTimeSpinBox->value(), (ColorSensorAccess::Gain)gainGroup.checkedId() ) )
     {
         QMessageBox::critical( this, "Error", "Failed to initialize color sensor" );
     }
@@ -135,7 +140,7 @@ void Widget::on_pushButton_8_clicked()
 {
     // Save log file
     QFileDialog saveDialog( this );
-    saveDialog.setDefaultSuffix( "*.csv" );
+    saveDialog.setDefaultSuffix( "csv" );
     QString ret = saveDialog.getSaveFileName( this, "Save log file", "log.csv", "*.csv" );
 
     if ( ret == "" ) {
@@ -168,7 +173,5 @@ void Widget::on_closeSensorButton_clicked()
 {
     colorSensor->closeSensor();
 
-    ui->openButton->setEnabled( true );
-    ui->initializeButton->setEnabled( false );
-    ui->closeSensorButton->setEnabled( false );
+    enableSensorButtons( false );
 }

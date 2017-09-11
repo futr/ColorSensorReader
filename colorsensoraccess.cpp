@@ -28,7 +28,7 @@ bool ColorSensorAccess::openSensor( QString filePath )
     return true;
 }
 
-bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intTime, ColorSensorAccess::Gain gain)
+bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intTime, bool manualIntegrationMode, uint16_t manualTime, ColorSensorAccess::Gain gain)
 {
     uint8_t bytes[4];
     uint8_t intTimeByte = 0;
@@ -40,17 +40,21 @@ bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intT
     // Copy args
     this->intTime = intTime;
     this->gain = gain;
+    this->manualIntegrationMode = manualIntegrationMode;
+    this->manualTime = manualTime;
 
     // Register address
     bytes[0] = 0x00;
     bytes[2] = 0x00;
 
-    if ( intTime == Manual ) {
+    if ( manualIntegrationMode ) {
         // This mode is not yet implemented
-        intTimeByte = ( gain << 3 ) | 0;
+        intTimeByte = ( gain << 3 ) | intTime | Manual;
     } else {
         intTimeByte = ( gain << 3 ) | intTime;
     }
+
+    controlByte = intTimeByte;
 
     // Using simple R/W APIs
     /*
@@ -68,10 +72,30 @@ bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intT
     i2c_msg i2cMsg[2];
     int ret;
 
+    // Write manual timing if mode is set to manual integration
+    // host processor is assumed as little endian in this block
+    if ( manualIntegrationMode ) {
+        bytes[0] = 0x01;
+        qToBigEndian<uint16_t>( manualTime, bytes + 1 );
+
+        i2cMsg[0].addr  = sensorAddress;
+        i2cMsg[0].buf   = bytes;
+        i2cMsg[0].flags = 0;
+        i2cMsg[0].len   = 3;
+
+        i2cData.msgs  = i2cMsg;
+        i2cData.nmsgs = 1;
+
+        ret = ioctl( file, I2C_RDWR, &i2cData );
+        qDebug() << ret;
+    }
+
     // reset ADC, disable sleeping
+    bytes[0] = 0x00;
     bytes[1] = 0x80 | intTimeByte;
 
     // start ADC
+    bytes[2] = 0x00;
     bytes[3] = 0x00 | intTimeByte;
 
     i2cMsg[0].addr  = sensorAddress;
@@ -88,8 +112,7 @@ bool ColorSensorAccess::initializeSensor(ColorSensorAccess::IntegrationTime intT
     i2cData.nmsgs = 2;
 
     ret = ioctl( file, I2C_RDWR, &i2cData );
-
-    //qDebug() << ret;
+    qDebug() << ret;
 
     return true;
 }
@@ -113,11 +136,6 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
         return ;
     }
 
-    // Wait until doing integration
-    if ( waitForIntegration ) {
-        waitIntegrationTime();
-    }
-
     // Using simple R/W IO APIs
     /*
     // Write register address to read
@@ -131,8 +149,33 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
     // Using IOCTL
     i2c_rdwr_ioctl_data i2cData;
     i2c_msg i2cMsg[2];
-    uint8_t reg = 0x03;
+    uint8_t reg;
     int ret;
+
+    // Disable sleep mode if integration mode is manual
+    if ( manualIntegrationMode ) {
+        bytes[0] = 0x00;
+        bytes[1] = controlByte & 0x0F;
+
+        i2cMsg[0].addr  = sensorAddress;
+        i2cMsg[0].buf   = bytes;
+        i2cMsg[0].flags = 0;
+        i2cMsg[0].len   = 2;
+
+        i2cData.msgs  = i2cMsg;
+        i2cData.nmsgs = 1;
+
+        ret = ioctl( file, I2C_RDWR, &i2cData );
+        qDebug() << ret;
+    }
+
+    // Wait until doing integration
+    if ( waitForIntegration ) {
+        waitIntegrationTime();
+    }
+
+    // Read data
+    reg = 0x03;
 
     i2cMsg[0].addr  = sensorAddress;
     i2cMsg[0].buf   = &reg;
@@ -148,21 +191,15 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
     i2cData.nmsgs = 2;
 
     ret = ioctl( file, I2C_RDWR, &i2cData );
+    qDebug() << ret;
 
-    //qDebug() << ret;
-
-    // Store into structure
+    // Store data into structure
+    // host processor is assumed as little endian in this block
     mutex.lock();
     colorData.red      = qFromBigEndian<uint16_t>( (uint16_t *)( bytes + 0 ) );
     colorData.green    = qFromBigEndian<uint16_t>( (uint16_t *)( bytes + 2 ) );
     colorData.blue     = qFromBigEndian<uint16_t>( (uint16_t *)( bytes + 4 ) );
     colorData.infraRed = qFromBigEndian<uint16_t>( (uint16_t *)( bytes + 6 ) );
-    /*
-    colorData.red      = *(uint16_t *)( bytes + 0 );
-    colorData.green    = *(uint16_t *)( bytes + 2 );
-    colorData.blue     = *(uint16_t *)( bytes + 4 );
-    colorData.infraRed = *(uint16_t *)( bytes + 6 );
-    */
     mutex.unlock();
 
     emit dataRead( colorData );
@@ -171,24 +208,51 @@ void ColorSensorAccess::readColors(bool waitForIntegration)
 void ColorSensorAccess::waitIntegrationTime()
 {
     // Wait for integration time
-    switch ( intTime ) {
-    case T00:
-        QThread::msleep( 1 );
-        break;
-    case T01:
-        QThread::msleep( 5 );
-        break;
-    case T10:
-        QThread::msleep( 30 );
-        break;
-    case T11:
-        QThread::msleep( 200 );
-        break;
-    default:
-        // Need to calculate integral time
-        QThread::msleep( 500 );
-        break;
+    unsigned int ms;
+
+    if ( !manualIntegrationMode ) {
+        // Static time integration mode
+        switch ( intTime ) {
+        case T00:
+            ms = 1;
+            break;
+        case T01:
+            ms = 5;
+            break;
+        case T10:
+            ms = 30;
+            break;
+        case T11:
+            ms = 200;
+            break;
+        default:
+            // NOT ENTER HERE
+            ms = 500;
+            break;
+        }
+    } else {
+        // Manual integration mode
+        switch ( intTime ) {
+        case T00:
+            ms = 1 * manualTime;
+            break;
+        case T01:
+            ms = 5 * manualTime;
+            break;
+        case T10:
+            ms = 60 * manualTime;
+            break;
+        case T11:
+            ms = 400 * manualTime;
+            break;
+        default:
+            // NOT ENTER HERE
+            ms = 500 * manualTime;
+            break;
+        }
     }
+
+    QThread::msleep( ms );
 }
 
 void ColorSensorAccess::startReading(bool continuously)
