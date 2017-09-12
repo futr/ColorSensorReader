@@ -313,13 +313,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="aboutLabel">
-       <property name="text">
-        <string>(c) ONCT 2017</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="quitButton">
        <property name="text">
         <string>Quit</string>
