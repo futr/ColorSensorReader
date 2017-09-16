@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=カラーセンサーリーダー
+GenericName=カラーセンサーリーダー
+Comment=i2cに接続されたS11059-02DTの値を読み込む
+Exec=/home/pi/colorsensor/colorsensor
+Icon=/home/pi/colorsensor/icon.png
+Terminal=false
+Categories=Application;
+StartupNotify=true
+
