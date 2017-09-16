@@ -25,9 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         widget.cpp \
-    colorsensoraccess.cpp
+    colorsensoraccess.cpp \
+    wavegraphwidget.cpp \
+    graph.cpp
 
 HEADERS  += widget.h \
-    colorsensoraccess.h
+    colorsensoraccess.h \
+    wavegraphwidget.h \
+    graph.h
 
 FORMS    += widget.ui

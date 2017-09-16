@@ -11,6 +11,7 @@
 #include <QTextStream>
 
 #include "colorsensoraccess.h"
+#include "graph.h"
 
 namespace Ui {
 class Widget;
@@ -34,6 +35,7 @@ private:
 
 public slots:
     void setData( ColorSensorAccess::ColorData data );
+    void setDataToGraph( ColorSensorAccess::ColorData data );
     void statusMessage( QString str );
 
 signals:

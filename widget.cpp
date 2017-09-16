@@ -28,6 +28,22 @@ Widget::Widget(QWidget *parent) :
     gainGroup.addButton( ui->lowButton, ColorSensorAccess::Low );
     gainGroup.addButton( ui->highButton, ColorSensorAccess::High );
 
+    // Initialize Graph widgets
+    ui->graphWidget->setLabel( tr( "RAW data" ) );
+    ui->graphWidget->wave->setXScale( 10 );
+    ui->graphWidget->wave->setXGrid( 10 );
+    ui->graphWidget->wave->setLegendFontSize( 12 );
+    ui->graphWidget->wave->setDefaultFontSize( 12 );
+    ui->graphWidget->wave->setShowCursor( true );
+    ui->graphWidget->wave->setXName( "" );
+    ui->graphWidget->wave->setForceRequestedRawX( true );
+    ui->graphWidget->wave->setUpSize( 4, 10000 );
+    ui->graphWidget->wave->setYGridCount( 1 );
+    ui->graphWidget->wave->setAutoUpdateYMax( true );
+    ui->graphWidget->wave->setAutoUpdateYMin( true );
+    ui->graphWidget->wave->setAutoZeroCenter( true );
+    ui->graphWidget->wave->setNames( QStringList() << "B" << "G" << "R" << "IR" );
+    ui->graphWidget->wave->setColors( QList<QColor>() << Qt::blue << Qt::darkGreen << Qt::red << Qt::darkRed );
 }
 
 Widget::~Widget()
@@ -52,12 +68,19 @@ void Widget::setData(ColorSensorAccess::ColorData data)
     ui->logEdit->appendPlainText( str );
     ui->logEdit->ensureCursorVisible();
 
+    // Push data to graph
+
     // Show last integration time if in manual integration mode
     if ( colorSensor->getManualIntegrationMode() ) {
         ui->intTimeLabel->setText( QString( "Last integration time : %1[ms]" ).arg( colorSensor->getLastElapsedNanosec() / 1000.0 / 1000 ) );
     } else {
         ui->intTimeLabel->setText( "Integration time measuring is not supported" );
     }
+}
+
+void Widget::setDataToGraph(ColorSensorAccess::ColorData data)
+{
+    ui->graphWidget->wave->enqueueData( QVector<double>( { (double)data.blue, (double)data.green, (double)data.red, (double)data.infraRed } ) );
 }
 
 void Widget::statusMessage(QString str)
