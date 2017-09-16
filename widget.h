@@ -37,6 +37,9 @@ public slots:
     void setData( ColorSensorAccess::ColorData data );
     void setDataToGraph( ColorSensorAccess::ColorData data );
     void statusMessage( QString str );
+    void clearGraph();
+    void setGraphXScale( int scale );
+    void setGraphXSGrid( int grid );
 
 signals:
     void doReading( bool continuously );
@@ -60,6 +63,10 @@ private slots:
     void on_stopReadingButton_clicked();
 
     void on_closeSensorButton_clicked();
+
+    void on_clearGraphButton_clicked();
+
+    void on_saveGraphButton_clicked();
 
 private:
     void setColorLabel( ColorSensorAccess::ColorData data );

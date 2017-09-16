@@ -1169,6 +1169,19 @@ void WaveGraphWidget::paintEvent(QPaintEvent *)
 
         QString strTop = QString::number( localMaxY );
         QString strBottom = QString::number( localMinY );
+
+        if ( autoUpdateYMax ) {
+            strTop = QString::number( localMaxY );
+        } else {
+            strTop = QString::number( yMax );
+        }
+
+        if ( autoUpdateYMin ) {
+            strBottom = QString::number( localMinY );
+        } else {
+            strBottom = QString::number( yMin );
+        }
+
         QRect frTop = p.fontMetrics().boundingRect( strTop );
         QRect frBottom = p.fontMetrics().boundingRect( strBottom );
 

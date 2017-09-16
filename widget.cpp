@@ -30,6 +30,7 @@ Widget::Widget(QWidget *parent) :
 
     // Initialize Graph widgets
     ui->graphWidget->setLabel( tr( "RAW data" ) );
+    ui->graphWidget->wave->setMinimumSize( 0, 0 );
     ui->graphWidget->wave->setXScale( 10 );
     ui->graphWidget->wave->setXGrid( 10 );
     ui->graphWidget->wave->setLegendFontSize( 12 );
@@ -38,12 +39,17 @@ Widget::Widget(QWidget *parent) :
     ui->graphWidget->wave->setXName( "" );
     ui->graphWidget->wave->setForceRequestedRawX( true );
     ui->graphWidget->wave->setUpSize( 4, 10000 );
-    ui->graphWidget->wave->setYGridCount( 1 );
+    ui->graphWidget->wave->setYGridCount( 2 );
     ui->graphWidget->wave->setAutoUpdateYMax( true );
-    ui->graphWidget->wave->setAutoUpdateYMin( true );
-    ui->graphWidget->wave->setAutoZeroCenter( true );
+    ui->graphWidget->wave->setAutoUpdateYMin( false );
+    ui->graphWidget->wave->setAutoZeroCenter( false );
+    ui->graphWidget->wave->setYMin( 0 );
     ui->graphWidget->wave->setNames( QStringList() << "B" << "G" << "R" << "IR" );
     ui->graphWidget->wave->setColors( QList<QColor>() << Qt::blue << Qt::darkGreen << Qt::red << Qt::darkRed );
+
+    // Connect spin box's signsls to graph widget
+    connect( ui->scaleSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setGraphXScale(int)) );
+    connect( ui->gridSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setGraphXSGrid(int)) );
 }
 
 Widget::~Widget()
@@ -69,6 +75,7 @@ void Widget::setData(ColorSensorAccess::ColorData data)
     ui->logEdit->ensureCursorVisible();
 
     // Push data to graph
+    setDataToGraph( data );
 
     // Show last integration time if in manual integration mode
     if ( colorSensor->getManualIntegrationMode() ) {
@@ -80,12 +87,30 @@ void Widget::setData(ColorSensorAccess::ColorData data)
 
 void Widget::setDataToGraph(ColorSensorAccess::ColorData data)
 {
-    ui->graphWidget->wave->enqueueData( QVector<double>( { (double)data.blue, (double)data.green, (double)data.red, (double)data.infraRed } ) );
+    int id = ui->graphWidget->wave->getQueueSize();
+
+    ui->graphWidget->wave->enqueueData( QVector<double>( { (double)id, (double)data.blue, (double)data.green, (double)data.red, (double)data.infraRed } ) );
 }
 
 void Widget::statusMessage(QString str)
 {
     ui->intTimeLabel->setText( str );
+}
+
+void Widget::clearGraph()
+{
+    ui->graphWidget->wave->clearQueue();
+}
+
+void Widget::setGraphXScale(int scale)
+{
+    ui->graphWidget->wave->setXScale( scale );
+}
+
+void Widget::setGraphXSGrid(int grid)
+{
+    ui->graphWidget->wave->setXGrid( grid );
+    ui->graphWidget->wave->update();
 }
 
 void Widget::enableSensorButtons(bool enable)
@@ -214,4 +239,23 @@ void Widget::on_closeSensorButton_clicked()
     colorSensor->closeSensor();
 
     enableSensorButtons( false );
+}
+
+void Widget::on_clearGraphButton_clicked()
+{
+    clearGraph();
+}
+
+void Widget::on_saveGraphButton_clicked()
+{
+    // Save log file
+    QFileDialog saveDialog( this );
+    saveDialog.setDefaultSuffix( "png" );
+    QString ret = saveDialog.getSaveFileName( this, "Save graph image", "graph.png", "*.png" );
+
+    if ( ret == "" ) {
+        return;
+    }
+
+    ui->graphWidget->wave->grab().save( ret, "PNG" );
 }
